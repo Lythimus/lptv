@@ -1,0 +1,118 @@
+/* This file will hold styles that are loaded using the same media query as the narrow grid. */
+/* If you are using the default media queries provided by Omega, these styles will also
+ *  apply to the normal and widescreen layouts. You may override these styles in the normal 
+ *  and widescreen CSS files as appropriate. */
+
+/*
+  MIN-WIDTH: 61.66666666em
+--------------------------------------------- */
+
+#region-content {
+        border-left-width: 0.382em;
+        border-right-width: 0.382em;
+        border-top-width: 0.618em;
+        border-bottom-width: 0.618em;
+        padding-top: 0.618em;
+        padding-bottom: 0.618em;
+	margin-left: 0;
+	margin-right: 0;
+}
+
+#region-content .region-content-inner {
+        margin-left: 0.618em;
+        margin-right: 0.618em;
+}
+
+.front .lpCategory .gameDescription, .view-recommendations .lpCategory .gameDescription {
+        height: 2.618rem;
+}
+
+.front .lp .lpThumb, .view-recommendations .lp .lpThumb {
+        max-width: 6.001rem;
+        max-height: 6.001rem;
+	float: left;
+	margin-right: 0.541rem;
+}
+
+.front .lp, .view-recommendations .views-row {
+        border-top: 1px solid #F0F0D8;
+}
+.node-lp .view-recommendations {
+	width: 41.127rem;
+}
+.view-display-id-similar {
+	display: none;
+}
+.front .lp {
+        max-height: 6.001rem;
+	width: 17.942rem;
+}
+
+.view-home-lps .views-row-2 .lp { 
+	margin-left: 1rem;
+	margin-right: 1rem;
+}
+
+
+/* LPer details */
+#lper-game-tiles .game { 
+	height: 15.71rem;
+	width: 15.71rem;
+}
+#lper-description {
+	width: 25.418rem;
+}
+
+/* LP details */
+
+#lp-video-container > * {
+	width: 46.97rem;
+	height: 342px;
+	float: right;
+	position: relative;
+}
+#lp-video-container {
+	padding-bottom: 0;
+	height: auto;
+}
+.view-lp-other-lpers { 
+	left: -206px;
+	position: absolute;
+	height: 342px;
+	overflow: hidden;
+	display: block;
+}
+.node-lp .video-description {
+        width: 15.71rem;
+}
+
+#other-lpers-overlay, .node-links {
+	display: none;
+}
+.node-lp .field-name-body {
+	float: left;
+	height: 100%;
+	display: block;
+	padding-right: 1rem;
+}
+
+h1 {
+  line-height: 1.618em;
+  font-size: 1.618em;
+  }
+
+h2 {
+  line-height: 1.618em;
+  font-size: 1.417em;
+  }
+
+h3 {
+  line-height: 1.417em;
+  font-size: 1.417em;
+  }
+
+h4 {
+  line-height: 1.417em;
+  font-size: 1em;
+  }
+

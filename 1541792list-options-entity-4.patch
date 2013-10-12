@@ -1,0 +1,92 @@
+diff --git a/core/modules/field/field.form.inc b/core/modules/field/field.form.inc
+index 8faa22b..4b86ab4 100644
+--- a/core/modules/field/field.form.inc
++++ b/core/modules/field/field.form.inc
+@@ -64,6 +64,7 @@ function field_default_form($entity_type, $entity, $field, $instance, $langcode,
+     if (function_exists($function)) {
+       $element = array(
+         '#entity_type' => $instance['entity_type'],
++        '#entity' => $entity,
+         '#bundle' => $instance['bundle'],
+         '#field_name' => $field_name,
+         '#language' => $langcode,
+diff --git a/core/modules/field/modules/list/list.module b/core/modules/field/modules/list/list.module
+index c2bff2a..688f0aa 100644
+--- a/core/modules/field/modules/list/list.module
++++ b/core/modules/field/modules/list/list.module
+@@ -419,7 +419,7 @@ function list_field_widget_info_alter(&$info) {
+ /**
+  * Implements hook_options_list().
+  */
+-function list_options_list($field, $instance) {
++function list_options_list($field, $instance, $entity_type, $entity) {
+   return list_allowed_values($field);
+ }
+ 
+diff --git a/core/modules/field/modules/options/options.api.php b/core/modules/field/modules/options/options.api.php
+index d1ac0db..ed08d7d 100644
+--- a/core/modules/field/modules/options/options.api.php
++++ b/core/modules/field/modules/options/options.api.php
+@@ -19,6 +19,11 @@
+  *   The instance definition. It is recommended to only use instance level
+  *   properties to filter out values from a list defined by field level
+  *   properties.
++ * @param $entity_type
++ *   The entity type the field is attached to.
++ * @param $entity
++ *   The entity objet the field is attached to, or NULL if no entity
++ *   exists (e.g. in field settings page).
+  *
+  * @return
+  *   The array of options for the field. Array keys are the values to be
+@@ -29,7 +34,7 @@
+  *   widget. The HTML tags defined in _field_filter_xss_allowed_tags() are
+  *   allowed, other tags will be filtered.
+  */
+-function hook_options_list($field, $instance) {
++function hook_options_list($field, $instance, $entity_type, $entity) {
+   // Sample structure.
+   $options = array(
+     0 => t('Zero'),
+diff --git a/core/modules/field/modules/options/options.module b/core/modules/field/modules/options/options.module
+index 04b88d8..e97f191 100644
+--- a/core/modules/field/modules/options/options.module
++++ b/core/modules/field/modules/options/options.module
+@@ -79,8 +79,11 @@ function options_field_widget_form(&$form, &$form_state, $field, $instance, $lan
+   $has_value = isset($items[0][$value_key]);
+   $properties = _options_properties($type, $multiple, $required, $has_value);
+ 
++  $entity_type = $element['#entity_type'];
++  $entity = $element['#entity'];
++
+   // Prepare the list of options.
+-  $options = _options_get_options($field, $instance, $properties);
++  $options = _options_get_options($field, $instance, $properties, $entity_type, $entity);
+ 
+   // Put current field values in shape.
+   $default_value = _options_storage_to_form($items, $options, $value_key, $properties);
+@@ -237,9 +240,9 @@ function _options_properties($type, $multiple, $required, $has_value) {
+ /**
+  * Collects the options for a field.
+  */
+-function _options_get_options($field, $instance, $properties) {
++function _options_get_options($field, $instance, $properties, $entity_type, $entity) {
+   // Get the list of options.
+-  $options = (array) module_invoke($field['module'], 'options_list', $field, $instance);
++  $options = (array) module_invoke($field['module'], 'options_list', $field, $instance, $entity_type, $entity);
+ 
+   // Sanitize the options.
+   _options_prepare_options($options, $properties);
+diff --git a/core/modules/taxonomy/taxonomy.module b/core/modules/taxonomy/taxonomy.module
+index e82edfc..fbec245 100644
+--- a/core/modules/taxonomy/taxonomy.module
++++ b/core/modules/taxonomy/taxonomy.module
+@@ -1124,7 +1124,7 @@ function taxonomy_field_widget_info_alter(&$info) {
+ /**
+  * Implements hook_options_list().
+  */
+-function taxonomy_options_list($field, $instance) {
++function taxonomy_options_list($field, $instance, $entity_type, $entity) {
+   $function = !empty($field['settings']['options_list_callback']) ? $field['settings']['options_list_callback'] : 'taxonomy_allowed_values';
+   return $function($field);
+ }

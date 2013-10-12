@@ -1,0 +1,6 @@
+name = Let's Play TV
+description = Properly manage a user's queue on LPTV.
+core = 7.x
+package = Views
+project = "letsplaytv"
+dependencies[] = views

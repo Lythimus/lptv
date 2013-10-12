@@ -1,0 +1,19 @@
+
+Field Definitions 7.x-1.x-dev
+-----------------------------
+Added file list and configuration link in field_definitions.info
+Added Cancel button when changing a field definition.
+#959550: Added the module as part of the Fields package.
+Initial snapshot for Drupal 7.
+
+CCK Field Definitions 6.x-1-x-dev
+---------------------------------
+Cleaned up admin settings form code.
+#866390: Added documentation to the README file.
+Fixed variable name for array that hold field data in non-fieldgroup content types.
+Cleaned up a bunch of things in the code, streamlined others, and added install hooks.
+Initial release for Drupal 6.x.
+
+CCK Field Definitions 5.x-1.0, 2008-11-17
+-----------------------------------------
+Initial release of cck_field_defs module. Already supporting Drupal 5.12.

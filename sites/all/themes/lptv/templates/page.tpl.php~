@@ -1,0 +1,41 @@
+<?php 
+/**
+ * @file
+ * Alpha's theme implementation to display a single Drupal page.
+ */
+
+  function random_row($table, $column) {
+      $max_sql = "SELECT max(" . $column . ") 
+                  AS max_id
+                  FROM " . $table;
+      $max_row = mysql_fetch_array(mysql_query($max_sql));
+      $random_number = mt_rand(1, $max_row['max_id']);
+      $random_sql = "SELECT * FROM " . $table . "
+                     WHERE " . $column . " >= " . $random_number . " 
+                     ORDER BY " . $column . " ASC
+                     LIMIT 1";
+      $random_row = mysql_fetch_row(mysql_query($random_sql));
+      if (!is_array($random_row)) {
+          $random_sql = "SELECT * FROM " . $table . "
+                         WHERE " . $column . " < " . $random_number . " 
+                         ORDER BY " . $column . " DESC
+                         LIMIT 1";
+          $random_row = mysql_fetch_row(mysql_query($random_sql));
+      }
+      return $random_row;
+  }
+
+?>
+<div<?php print $attributes; ?>>
+  <?php if (isset($page['header'])) : ?>
+    <?php print render($page['header']); ?>
+  <?php endif; ?>
+  
+  <?php if (isset($page['content'])) : ?>
+    <?php print render($page['content'])."test"; ?>
+  <?php endif; ?>  
+  
+  <?php if (isset($page['footer'])) : ?>
+    <?php print render($page['footer']); ?>
+  <?php endif; ?>
+</div>

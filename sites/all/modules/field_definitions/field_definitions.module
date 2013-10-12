@@ -1,0 +1,266 @@
+<?php
+
+/**
+ * Implements hook_help().
+ */
+function field_definitions_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#field_definitions':
+      return t('The purpose of this module is to present the user a list of all the fields with their descriptions from a particular node type. This works especially well for forms that are very long, with hundreds of fields, so that users can see at a glance the form in detail. Users with the proper permissions are able to change the field labels or descriptions from within the dictionary itself without having to access the node type settings.');
+    case 'admin/modules#description':
+      return t('Allows the user to view or change field definitions from outside of the admin interface.');
+  }
+}
+
+/**
+ * Implements hook_perm().
+ */
+function field_definitions_permission() {
+  return array(
+    'administer field definitions' => array(
+      'title' => t('Administer field definitions'),
+    ),
+    'view field definitions' => array(
+      'title' => t('View field definitions'),
+    ),
+    'edit field definitions' => array(
+      'title' => t('Edit field definitions'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_menu().
+ */
+function field_definitions_menu() {
+  $items = array();
+  // No arguments: list all node types with definitions
+  $items['field_definitions'] = array(
+    'title' => variable_get('field_definitions_title', 'Field definitions'),
+    'page callback' => 'field_definitions_list',
+    'access arguments' => array('view field definitions'),
+  );
+  // One argument: definitions for a particular node type
+  $items['field_definitions/%node_type'] = array(
+    'title' => variable_get('field_definitions_title', 'Field definitions'),
+    'page callback' => 'field_definitions_type',
+    'page arguments' => array(1),
+    'access arguments' => array('view field definitions'),
+    'type' => MENU_CALLBACK,
+  );
+  // Two arguments: change definition for a particular field
+  $items['field_definitions/%node_type/%'] = array(
+    'title' => variable_get('field_definitions_title', 'Field definitions'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('field_definitions_edit_form', 1, 2),
+    'access arguments' => array('edit field definitions'),
+    'type' => MENU_CALLBACK,
+  );
+  // Administrative settings
+  $items['admin/config/content/field_definitions'] = array(
+    'title' => variable_get('field_definitions_title', 'Field definitions'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('field_definitions_settings_form'),
+    'access arguments' => array('administer field definitions'),
+    'description' => 'Allows the user to configure different options for the definitions on a dictionary page.',
+  );
+  return $items;
+}
+
+/**
+ * Implements hook_form_alter() for node_type_form.
+ *
+ * Allow users with administer nodes permissions to enable/disable definitions
+ * for particular node types.
+ */
+function field_definitions_form_node_type_form_alter(&$form, &$form_state) {
+  $form['field_definitions'] = array(
+    '#type' => 'fieldset',
+    '#title' => t('Field definitions'),
+    '#collapsible' => TRUE,
+    '#collapsed' => TRUE,
+    '#group' => 'additional_settings',
+    '#access' => user_access('administer field definitions'),
+  );
+  $form['field_definitions']['field_definitions_expose'] = array(
+    '#type' => 'radios',
+    '#title' => t('Enable viewing and editing of field definitions.'),
+    '#default_value' => variable_get('field_definitions_expose_' . $form['#node_type']->type, 0),
+    '#options' => array(
+      0 => t('Disabled'),
+      1 => t('Enabled'),
+    ),
+    '#description' => t('Enable this option to allow users to view a dictionary of field definitions and modify it if allowed.'),
+  );
+}
+
+/**
+ * Presents the list of node types that have definitions enabled.
+ */
+function field_definitions_list() {
+  $list = array();
+  $node_types = node_type_get_types();
+  // Display a list of node types that have definitions set.
+  foreach ($node_types as $node_type) {
+    if (variable_get('field_definitions_expose_' . $node_type->type, 0)) {
+      $list[$node_type->type] = array(
+        '#type' => 'item',
+        '#title' => l($node_type->name, 'field_definitions/' . $node_type->type),
+        '#description' => check_markup($node_type->description, 'filtered_html'),
+      );
+    }
+  }
+  if (empty($list)) {
+    drupal_set_message(t('Please enable field definitions for each node type you want to use it for.'), 'error');
+    drupal_goto('admin/structure/types');
+  }
+  return $list;
+}
+
+/**
+ * Presents the definitions for fields of the specified node type.
+ */
+function field_definitions_type($type) {
+  // Return if no definitions set for this node type.
+  if (!variable_get('field_definitions_expose_' . $type->type, 0)) {
+    return drupal_not_found();
+  }
+  drupal_set_title(t('@definitions for @type', array('@definitions' => variable_get('field_definitions_title', 'Field definitions'), '@type' => $type->name)));
+  $definitions = array();
+  $instances = field_info_instances();
+  foreach ($instances as $entity) {
+    if (isset($entity[$type->type])) {
+      foreach ($entity[$type->type] as $field) {
+        $definitions[$field['field_name']] = array(
+          '#type' => 'item',
+          '#title' => check_plain($field['label']) . (user_access('edit field definitions') ? '&nbsp;' . l(t('[edit]'), arg(0) . '/' . $type->type . '/' . $field['field_name'], array('attributes' => array('class' => array('field-definitions-edit-link')))) : ''),
+          '#description' => check_markup($field['description'], 'filtered_html'),
+          '#weight' => $field['widget']['weight'],
+          '#attached' => array(
+            'css' => array(
+              drupal_get_path('module', 'field_definitions') . '/field_definitions.css',
+            ),
+          ),
+        );
+      }
+    }
+  }
+  if (empty($definitions)) {
+    drupal_set_message(t('Please add fields to this node type.'), 'error');
+    drupal_goto('admin/structure/types/manage/' . $type->type . '/fields');
+  }
+  return $definitions;
+}
+
+/**
+ * Creates the form used for updating the field definition.
+ */
+function field_definitions_edit_form($form, &$form_state, $type, $field) {
+  $field = field_info_instance($type->module, $field, $type->type);
+  drupal_set_title(t('Edit @field definition', array('@field' => $field['label'])));
+  $form['field_definitions']['field_label'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Field Label'),
+    '#default_value' => $field['label'],
+    '#description' => t('Enter the label for this field.'),
+    '#weight' => -1,
+    '#access' => variable_get('field_definitions_label', 0),
+  );
+  $form['field_definitions']['field_description'] = array(
+    '#type' => 'textarea',
+    '#title' => t('Field Definition'),
+    '#default_value' => $field['description'],
+    '#description' => t('Enter the description/definition for this field.'),
+    '#weight' => 0,
+    '#access' => variable_get('field_definitions_desc', 0),
+  );
+  $form['field_definitions']['field_submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    '#weight' => 1,
+    '#submit' => array('field_definitions_edit_form_submit'),
+  );
+  $form['field_definitions']['cancel'] = array(
+    '#type' => 'markup',
+    '#markup' => l(t('Cancel'), 'field_definitions/' . $type->type),
+    '#weight' => 2,
+  );
+  $form['field_definitions']['field_type'] = array(
+    '#type' => 'hidden',
+    '#default_value' => $type->type,
+  );
+  $form['field_definitions']['field_name'] = array(
+    '#type' => 'hidden',
+    '#default_value' => $field['field_name'],
+  );
+  return $form;
+}
+
+/**
+ * Submits the form used for updating the field definition.
+ */
+function field_definitions_edit_form_submit($form, &$form_state) {
+  $type = node_type_load($form_state['values']['field_type']);
+  $instance = field_info_instance($type->module, $form_state['values']['field_name'], $type->type);
+  $instance['label'] = $form_state['values']['field_label'];
+  $instance['description'] = $form_state['values']['field_description'];
+  field_update_instance($instance);
+  drupal_set_message(t('Definition for %field updated successfully.', array('%field' => $form_state['values']['field_label'])));
+  $form_state['redirect'] = url('field_definitions/' . $type->type);
+}
+
+/**
+ * Creates the form used for admin settings.
+ */
+function field_definitions_settings_form($form, &$form_state) {
+  $form['field_definitions_help'] = array(
+    '#type' => 'markup',
+    '#markup' => t('@title can be found !link', array('@title' => variable_get('field_definitions_title', 'Field definitions'), '!link' => l('here', 'field_definitions'))),
+    '#weight' => -10,
+  );
+  $form['field_definitions_title'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Title for definitions page'),
+    '#default_value' => variable_get('field_definitions_title', 'Field definitions'),
+    '#description' => t('This is the title shown on the page that contains the list of all the fields with their definitions.'),
+    '#required' => TRUE,
+    '#weight' => -9,
+  );
+  $form['field_definitions_label'] = array(
+    '#type' => 'radios',
+    '#title' => t('Allow labels to be changed?'),
+    '#options' => array(
+      1 => t('Yes'),
+      0 => t('No'),
+    ),
+    '#default_value' => variable_get('field_definitions_label', 0),
+    '#description' => t('Note: changing the label does not change the internal field name. Using this to change the purpose of the field might make old data irrelevant.'),
+    '#required' => TRUE,
+    '#weight' => -8,
+  );
+  $form['field_definitions_desc'] = array(
+    '#type' => 'radios',
+    '#title' => t('Allow descriptions to be changed?'),
+    '#options' => array(
+      1 => t('Yes'),
+      0 => t('No'),
+    ),
+    '#default_value' => variable_get('field_definitions_desc', 1),
+    '#description' => t('This is the description of the field. You probably want to leave this on if you have field descriptions that change frequently.'),
+    '#required' => TRUE,
+    '#weight' => -7,
+  );
+  $form['field_definitions_collapse'] = array(
+    '#type' => 'radios',
+    '#title' => t('Should field groups be collapsed by default?'),
+    '#options' => array(
+      1 => t('Yes'),
+      0 => t('No'),
+    ),
+    '#default_value' => variable_get('field_definitions_collapse', 1),
+    '#description' => t('In case of a node type using field groups, would you want them to be collapsed by default on the definitions page? Note: this would be a good thing to have if the amount of fields is too long and you have many field groups.'),
+    '#required' => TRUE,
+    '#weight' => -6,
+  );
+  return system_settings_form($form);
+}

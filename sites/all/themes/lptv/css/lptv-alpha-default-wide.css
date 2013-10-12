@@ -1,0 +1,82 @@
+/* This file will hold styles that are loaded using the same media query as the wide grid. */
+
+body .container-12 { 
+	width: 1220px;
+}
+
+  p {
+    font-size: 1.417em/1.618em;
+    }
+
+ 
+#region-sidebar-second {
+	display: block;
+}
+
+.front .lpCategory .gameDescription {
+        height: 4.236em;
+}
+
+.front .lp {
+	width: 29.03em;
+}
+
+.view-lp-other-lpers {
+	left: auto;
+	position: static;
+}
+#other-lpers-overlay {
+	display: block;
+}
+
+h1 {
+  margin: 1em 0 0.618em;
+  line-height: 1em;
+  font-size: 2.618em;
+  }
+
+h2 {
+  line-height: 1.618em;
+  font-size: 2.292em;
+  }
+
+h3 {
+  line-height: 1.618em;
+  font-size: 1.618em;
+  }
+
+h4 {
+  line-height: 1.618em;
+  font-size: 1em;
+  }
+
+  .dropcap:first-letter {
+    font: 3.32956em/0.7em Georgia, serif;
+    -webkit-font-smoothing: antialiased;
+    margin: .2em .15em .1em 0;
+    float: left;
+    }
+
+  .ie9 .dropcap:first-letter {
+    margin: .2em .45em 0 0;
+    line-height: .9em;
+    }
+#lp-video-container > * {
+	width: 66.543rem;
+	height: 474px;
+}
+.node-lp .node-links {
+	height: 474px;
+}
+.view-recommendations .lp {
+	width: 41.127rem;
+}
+.view-display-id-similar .lp {
+        width: 29.03rem;
+}
+#lper-game-tiles {
+	width: 53.826rem; /* (17.942*3) */
+}
+#lper-description {
+	width: 41.127rem;
+}

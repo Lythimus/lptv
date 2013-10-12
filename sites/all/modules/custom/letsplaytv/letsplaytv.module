@@ -1,0 +1,66 @@
+<?php
+/**
+ * Implements hook_field_formatter_info().
+ */
+function letsplaytv_field_formatter_info() {
+  return array(
+    'lptv_time_from_seconds' => array(
+      'label' => t('Time length'),
+      'field types' => array('number_integer'),
+      'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function letsplaytv_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  $element[0]['#markup'] = secondsToHuman($items[0]['value']);
+  return $element;
+}
+
+function secondsToHuman($seconds) {
+  if ($seconds > 86400)
+    $time = gmdate("d:H:i:s", $seconds);
+  elseif ($seconds > 3600)
+    $time = gmdate("H:i:s", $seconds);
+  elseif ($seconds > 60)
+    $time = gmdate("i:s", $seconds);
+  else
+    $time = $seconds;
+  return ltrim($time, '0');
+}
+
+global $user;
+/**
+ * Implements hook_preprocess_node()
+ */
+function letsplaytv_preprocess_node(&$variables) {
+  if ($variables['type'] == 'lp') {
+    module_load_include('inc', 'user', 'user.pages');
+    $account = user_load(1);
+    $form = drupal_get_form('user_profile_form', $account);
+    $variables['user_queue_form'] = render($form);
+    dpm($variables['user_queue_form']);
+  }
+}
+
+/**
+ * Implements hook_form_alter()
+ */
+function letsplaytv_form_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'user_profile_form') {
+    $form['account']['mail']['#default_value'] = 'jrcoco@my.uno.edu';
+    unset($form['account']['name']);
+    unset($form['account']['mail']);
+    unset($form['account']['pass']);
+    unset($form['account']['current_pass_required_values']);
+    unset($form['account']['current_pass']);
+    unset($form['account']['status']);
+    unset($form['account']['roles']);
+    unset($form['account']['notify']);
+    dpm($form);
+  }
+}

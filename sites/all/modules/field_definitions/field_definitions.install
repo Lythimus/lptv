@@ -1,0 +1,21 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the field_definitions module.
+ */
+
+function field_definitions_install() {
+  // Clear caches to take into account the changes immediately.
+  field_cache_clear();
+}
+
+function field_definitions_uninstall() {
+  // Remove variables set by this module.
+  variable_del('field_definitions_title');
+  variable_del('field_definitions_label');
+  variable_del('field_definitions_desc');
+  variable_del('field_definitions_collapse');
+  // Clear caches to take into account the changes immediately.
+  field_cache_clear();
+}

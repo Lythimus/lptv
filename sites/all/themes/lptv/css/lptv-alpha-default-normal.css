@@ -1,0 +1,116 @@
+/* This file will hold styles that are loaded using the same media query as the normal grid. */
+/* If you are using the default media queries provided by Omega, these styles will also
+ *  apply to the widescreen layout unless they are overridden by the widescreen styles. */
+
+.container-12 .grid-12 { 
+	width: 960px;
+}
+
+#region-content {
+        border-left-width: 0.618em;
+        border-right-width: 0.618em;
+        border-top-width: 0.876em;
+        border-bottom-width: 0.876em;
+        padding-top: 0.876em;
+        padding-bottom: 0.876em;
+	margin-left: 0;
+	margin-right: 0;
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
+#region-content .region-content-inner {
+	margin-left: 0em;
+	margin-right: 0em;
+}
+
+.front .lpCategory .gameDescription, .view-recommendations .lpCategory .gameDescription {
+        height: 3.709em;
+}
+
+.front h1.lpHeading, .view-recommendations h1.lpHeading {
+	font-family: OrangeKidRegular;
+	letter-spacing: normal;
+}
+.front .lp, .view-recommendations .lp {
+        border-top: 1px solid #F0F0D8;
+	width: 25.418rem;
+}
+.front .lp p {
+        display: block;
+}
+.node-lp .view-recommendations {
+	padding-right: 1rem;
+	width: auto;
+}
+.node-lp .video-description {
+	width: 25.418rem;
+}
+.front .lp .lpThumb, .view-recommendations .lp .lpThumb {
+        max-width: 6.001rem;
+        max-height: 6.001rem;
+	float: left;
+	margin-right: 0.876rem;
+}
+.front .lp .lpTitles h3, .view-recommendations .lp .lpTitles h3 {
+	
+}
+.view-display-id-similar {
+	display: block;
+}
+
+.view-home-lps .views-row-2 .lp { 
+	margin-left: 12px;
+	margin-right: 12px;
+}
+
+#lp-video-container > * {
+	width: 46.97rem;
+	height: 342px;
+}
+.view-lp-other-lpers {
+	height: 342px;
+	position: static;
+	margin-left: -1em;
+	margin-right: -145px;
+}
+#other-lpers-overlay, .node-lp .node-links {
+  display: block;
+}
+
+h1 {
+  margin: 0.876em 0 0.541em;
+  line-height: 1em;
+  font-size: 2.292em;
+  }
+
+.ie h1 {
+  font-size: 4.236em;
+  }
+
+h2 {
+  line-height: 1.618em;
+  font-size: 1.618em;
+  }
+
+h3 {
+  line-height: 1.417em;
+  font-size: 1.417em;
+  }
+
+h4 {
+  line-height: 1.618em;
+  font-size: 1em;
+  }
+
+#mainMenu {
+        height: 3.709em;
+        font-size: 2.618em;
+        line-height: 3.709em;
+}
+.node-lp .node-links {
+	height: 342px;
+}
+.node-lper #lper-description {
+	width: 41.127rem;
+}
